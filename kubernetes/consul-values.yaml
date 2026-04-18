@@ -1,6 +1,7 @@
 global:
   name: consul
   datacenter: dc1
+  # Remove specific image versions - let the modern chart pick the right ones
   tls:
     enabled: true
   gke:
@@ -9,7 +10,6 @@ global:
 server:
   replicas: 1
   bootstrapExpect: 1
-  # GKE Autopilot requires these minimums for Anti-Affinity
   resources:
     requests:
       cpu: "500m"
@@ -20,21 +20,23 @@ server:
 
 connectInject:
   enabled: true
+  # This setting tells the NEW chart to ignore the old Alpha APIs
   apiGateway:
     manageExternalCRDs: false
-  # The injector also needs enough resources for Autopilot
   resources:
     requests:
-      cpu: "250m"
-      memory: "256Mi"
+      cpu: "500m"
+      memory: "512Mi"
     limits:
-      cpu: "250m"
-      memory: "256Mi"
+      cpu: "500m"
+      memory: "512Mi"
 
+# Turn off the Mesh Gateway to keep GKE Autopilot happy
 meshGateway:
   enabled: false
 
 ui:
   enabled: true
   service:
+    enabled: true  # <--- THIS IS THE MISSING KEY
     type: LoadBalancer
